@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>lyrics</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <main class="main">
+
+        <header class="header">
+            <h1 class="title">Lyrics</h1>
+        </header>
+
+        <form class="lyric-search" id="lyric-form">
+
+            <label for="search-input" class="label">Search for a song or artist</label>
+            <div class="search-section">
+                <input type="text" id="search-input" class="search-input" spellcheck="false" autocomplete="off">
+                <button id="search-button" class="button">Search</button>
+            </div>
+            <span id="error" class="error"></span>
+        </form>
+
+        <section class="lyrics hidden" id="lyrics">
+            <ul class="response" id="response"></ul>
+        </section>
+
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
