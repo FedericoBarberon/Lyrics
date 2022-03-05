@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>lyrics</title>
+    <title>Lyrics</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -18,16 +18,23 @@
         <form class="lyric-search" id="lyric-form">
 
             <label for="search-input" class="label">Search for a song or artist</label>
+
             <div class="search-section">
+
                 <input type="text" id="search-input" class="search-input" spellcheck="false" autocomplete="off">
-                <button id="search-button" class="button">Search</button>
+                <button id="search-button" class="button enable">Search</button>
+
             </div>
             <span id="error" class="error"></span>
         </form>
 
-        <section class="lyrics hidden" id="lyrics">
-            <ul class="response" id="response"></ul>
+        <section class="content hidden" id="content">
+            <div class="lyrics-section" id="lyrics-section"></div>
         </section>
+        <nav class="nav hidden" id="nav">
+            <button class="button prev disable" id="prev">Previous</button>
+            <button class="button next disable" id="next">Next</button>
+        </nav>
 
     </main>
 
