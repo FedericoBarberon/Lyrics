@@ -1,85 +1,126 @@
 const API = "https://api.lyrics.ovh";
 
-const lyricForm = document.getElementById("lyric-form");
-const searchInput = document.getElementById("search-input");
-const content = document.getElementById("lyrics");
-const lyricsSection = document.getElementById("response");
-
+const search = document.getElementById("search-input");
+const form = document.getElementById("lyric-form");
+const content = document.getElementById("content");
+const lyricsSection = document.getElementById("lyrics-section");
+const nav = document.getElementById("nav");
+const next = document.getElementById("next")
+const prev = document.getElementById("prev")
 const error = document.getElementById("error");
+let actualSearch;
 
-
-lyricForm.addEventListener("submit", (e) => {
+form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    content.classList.replace('show', 'hidden');
-    lyricsSection.innerHTML = '';
+    const searchTerm = search.value.trim();
+    content.classList.replace("show","hidden");
+    nav.classList.replace("show","hidden");
+
+    if (!searchTerm) {
+        alert("You must type a valid search term");
+        return;
+    }
+
+    searchSongs(searchTerm);
+})
+
+const searchSongs = async (search) => {    
     error.textContent = '';
 
-    const searchTerm = searchInput.value.trim();
-
-    requestSearch(`${API}/suggest/${searchTerm}`)
+    fetch(`${API}/suggest/${search}`)
+        .then(res => res.json())
+        .then(res => res.total != 0? Promise.resolve(res):Promise.reject("Search Error"))
         .then(response => {
-            if (response.total != 0) {
-                content.classList.replace('hidden','show');
-                showResponse(response.data);
-            } else {
-                showError("Search Error");
-            }
+            const data = response.data;
+            checkNav(response.next,response.prev);
+            showSongs(data);
         })
-        .catch(err => showError(err.message));
-});
+        .catch(showError);
+}
 
-content.addEventListener("click", (e) => {
-    let target = e.target;
+const showSongs = (songs) => {
+    content.classList.replace("hidden", "show");
+    nav.classList.replace("hidden","show");
+    actualSearch = `
+        <ul class="songs">
+            ${songs.map(song => {
+                return `<li class="song" data-title="${song.title}" data-artist="${song.artist.name}">
+                    <img src="${song.album.cover_small}" class="album-image"></img>
+                    <span class="song-data">${song.title} - <a href="#" class="artist-link">${song.artist.name} </a></span>
+                    <button class="button enable" id="show-lyric">Lyric</button>
+                </li>`
+            }).join('')}
+        </ul>
+    `;
+    lyricsSection.innerHTML = actualSearch;
+}
+
+content.addEventListener("click", (ev) => {
+    const target = ev.target;
+
     if(target.id == 'show-lyric'){
-        const songTitle = target.dataset.title;
-        const artist = target.dataset.artist;
-
-        requestSearch(`${API}/v1/${artist}/${songTitle}`)
-            .then(lyric => {
-                showLyric(lyric.lyrics, songTitle, artist);
-            })
-            .catch(() => showError("The song has no lyrics"));
+        const songArtist = target.parentElement.dataset.artist;
+        const songTitle = target.parentElement.dataset.title;
+        
+        searchLyric(songArtist,songTitle);
+    }
+    else if(target.id == 'back'){
+        nav.classList.replace("hidden","show");
+        lyricsSection.innerHTML = actualSearch;
     }
 })
 
+const searchLyric = (artist,title) => {
+    error.textContent = '';
 
-const requestSearch = async (url) => {
-    return await (await fetch(url)).json();
+    fetch(`${API}/v1/${artist}/${title}`)
+        .then(res => res.json())
+        .then(res => res.error? Promise.reject("The song has no lyrics"):Promise.resolve(res))
+        .then(response => {
+            const lyric = response.lyrics.replace(/[\r\n|\n|\r]/g, '<br>');
+        
+            showLyric(lyric, title, artist);
+        })
+        .catch(showError);
+
 }
 
+const showLyric = (lyric,title,artist) => {
+    nav.classList.replace("show","hidden");
+    lyricsSection.innerHTML = `
+        <span class="lyric-data">${title} <i>by</i> <a href="#" class="artist-link">${artist}</a></span>
+        <button class="button enable back" id="back">Back</button>
 
-const showResponse = (response) => {
-    response.forEach(song => {
-        createSongItem(song);
-    })
+        <p class="lyric">${lyric}</p>
+    `;
 }
 
-const showLyric = (lyric, title, artist) => {
-    const songTitle = document.createElement("h2");
-    songTitle.innerHTML = `${title} <i>by</i> <a href="#" class="artist-link">${artist}</a>`;
-    songTitle.classList.add("song-title");
-
-    const songLyric = document.createElement("p");
-    songLyric.innerHTML = lyric.replace(/(\r\n|\n|\r)/g, '<br>');
-    songLyric.classList.add("song-lyric");
-
-    lyricsSection.innerHTML = '';
-    lyricsSection.appendChild(songTitle);
-    lyricsSection.appendChild(songLyric);
+const showError = (err) => {
+    error.textContent = err;
 }
 
-const createSongItem = (song) => {
-    const newSong = document.createElement("div");
-    newSong.classList.add("song");
-    newSong.innerHTML = `<img src="${song.album.cover_small}" alt="image" class="album-image">
-    <li class="song-name">${song.title} - <a href="#" class="artist-link">${song.artist.name}</a></li>
-    <button id="show-lyric" class="button" data-title="${song.title}" data-artist="${song.artist.name}">Lyric</button>`;
+const checkNav = (nextUrl, prevUrl) => {
+    if(nextUrl) {
+        next.classList.replace("disable","enable");
 
-    lyricsSection.appendChild(newSong);
+        next.addEventListener("click", () => {
+            searchNext(nextUrl);
+        })
+    } else {
+        next.classList.replace("enable","disable");
+    }
+
+    if(prevUrl) {
+        prev.classList.replace("disable","enable");
+    } else {
+        prev.classList.replace("enable","disable");
+    }
 }
 
-const showError = (typeError) => {
-    error.textContent = `${typeError}`;
+const searchNext = (url) => {
+    console.log(url);
+    fetch(url)
+        .then(res => res.json())
+        .then(res => console.log(res))
 }
-
