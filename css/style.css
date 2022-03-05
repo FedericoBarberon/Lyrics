@@ -19,7 +19,7 @@ body {
 
 .main {
     position: relative;
-    width: 40%;
+    width: 50%;
     min-width: 450px;
     padding: 2rem;
     padding-top: 100px;
@@ -83,10 +83,12 @@ body {
     background-color: white;
     font-weight: bold;
     flex-grow: 1;
+    transition: box-shadow .2s;
 }
 
 .search-input:focus {
-    outline: none
+    outline: none;
+    box-shadow: 0 0 0 2px;
 }
 
 .button {
@@ -94,13 +96,18 @@ body {
     border: 1px solid black;
     border-radius: 5px;
     background-color: rgb(218, 40, 40);
+    transition: background-color .1s;
     font-weight: bold;
     color: white;
     cursor: pointer;
 }
 
-.button:active {
-    background-color: red;
+.button.enable:hover {
+    background-color: rgb(255, 53, 53);
+}
+
+.button.enable:active {
+    background-color: rgb(190, 58, 58);
 }
 
 .error {
@@ -111,10 +118,11 @@ body {
     font-weight: bold;
 }
 
-/* Lyrics */
+/* Content */
 
-.lyrics{
-    height: 300px;
+.content{
+    position: relative;
+    max-height: 300px;
     margin-top: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 3px black;
@@ -122,18 +130,22 @@ body {
     background-color: white;
 }
 
-.lyrics::-webkit-scrollbar {
+.content::-webkit-scrollbar {
     width: 18px;
 }
 
-.lyrics::-webkit-scrollbar-thumb {
+.content::-webkit-scrollbar-thumb {
     box-sizing: border-box;
     border: 5px solid white;
     border-radius: 20px;
-    background-color: rgb(56, 45, 45)
+    background-color: rgb(94, 84, 84)
 }
 
-.response {
+.content::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(56, 45, 45);
+}
+
+.songs {
     margin: 0;
     padding: 0;
     list-style-type: none;
@@ -141,9 +153,12 @@ body {
 
 .song {
     display: flex;
+    gap: 20px;
     width: 100%;
+    margin-bottom: 0;
     padding: .5rem 1rem;
     align-items: center;
+    transition: background-color .2s;
 }
 
 .song:hover {
@@ -153,32 +168,74 @@ body {
 .album-image {
     width: 35px;
     height: 35px;
-    margin-right: 20px;
     border: 2px solid black;
     border-radius: 5px;
 }
 
-.song-name {
-    width: 50%;
+.song-data {
     flex-grow: 1;
     font-size: 20px;
     cursor: default;
 }
 
-.song-title, .song-lyric {
+.lyric-data, .lyric {
     margin-inline: 1rem;
     color: rgb(32, 34, 34);
 }
-.song-title {
+
+
+.back {
+    position: absolute;
+    top: 10px;
+    right: 1rem;
+}
+
+.lyric-data {
+    display: inline-block;
+    margin-block: 1rem;
+    margin-right: 80px;
     font-size: 20px;
+    font-weight: bold;
+}
+
+
+.lyric {
+    line-height: 20px;
 }
 
 .artist-link {
     color: inherit;
     text-decoration: none;
+    transition: color .2s;
 }
 
 .artist-link:hover {
     color: red;
     text-decoration: underline;
+}
+.nav.show {
+    width: 100%;
+    display: flex;
+    margin-top: 10px;
+    padding: .5rem 1rem;
+    justify-content: space-between;
+    border-radius: 10px;
+    box-shadow: 0 0 3px black;
+    background-color: rgb(32, 34, 34);
+}
+
+.next, .prev {
+    padding: 5px 20px;
+    border: none;
+    font-size: 10px;
+}
+
+.disable {
+    filter: brightness(50%);
+    cursor: not-allowed;
+}
+
+.enable {
+    filter: brightness(100%);
+    cursor: pointer;
 }
